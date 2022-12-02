@@ -1,0 +1,31 @@
+name: tiled
+
+# micromamba create -n tiled -f environment.yml -y
+# micromamba activate tiled
+
+channels:
+  - conda-forge
+  - defaults
+
+dependencies:
+  - python >=3.8, <3.11
+
+  # dependencies not automatically installed by 'pip install tiled' below
+  - bson
+  - event-model
+  - pymongo
+
+  # additional dependencies of the file directory support additions
+  - h5py
+  - hdf5plugin
+  - punx
+  - spec2nexus
+
+  # rely on pip to install tiled and its dependencies
+  - pip:
+    - databroker >=2.0.0b12
+    - tiled[all] >=0.1.0a80
+
+    # additional dependencies of the file directory support additions
+    # install from GitHub repository
+    - https://raw.githubusercontent.com/EPICS-synApps/support/master/utils/mdaPythonUtils/mdalib-2022.post9-py2.py3-none-any.whl

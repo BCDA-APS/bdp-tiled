@@ -1,0 +1,55 @@
+# config.yml
+
+# tiled serve config --public --host 0.0.0.0 config.yml
+# http://SERVER.xray.aps.anl.gov:8000/
+
+trees:
+
+  - path: 45id_instrument
+    tree: databroker.mongo_normalized:Tree.from_uri
+    args:
+      # for unsecured access
+      uri: mongodb://DB_SERVER.xray.aps.anl.gov:27017/45id_instrument-bluesky
+
+  # - path: older_45id_instrument
+  #   tree: databroker.mongo_normalized:Tree.from_uri
+  #   args:
+  #     # for unsecured access
+  #     uri: mongodb://DB_SERVER.xray.aps.anl.gov:27017/older_45id_instrument-bluesky
+
+  # - path: files
+  #   tree: files
+  #   args:
+  #     directory: /data/directory/path
+  #     key_from_filename: tiled.adapters.files:identity
+  #     mimetype_detection_hook: custom:detect_mimetype
+  #     mimetypes_by_file_ext:
+  #       .avif: image/avif
+  #       .dat: text/spec_data
+  #       .docx: application/octet-stream
+  #       .DS_Store: text/plain
+  #       .h5: application/x-hdf5
+  #       .hdf: application/x-hdf5
+  #       .pptx: application/octet-stream
+  #       .pyc: application/octet-stream
+  #       .webp: image/webp
+  #     readers_by_mimetype:
+  #       application/json: ignore_data:read_ignore
+  #       application/octet-stream: ignore_data:read_ignore
+  #       application/xop+xml: ignore_data:read_ignore
+  #       application/zip: ignore_data:read_ignore
+  #       image/avif: ignore_data:read_ignore
+  #       image/bmp: image_data:read_image
+  #       image/gif: image_data:read_image
+  #       image/jpeg: image_data:read_image
+  #       image/png: image_data:read_image
+  #       image/svg+xml: ignore_data:read_ignore
+  #       image/tiff: image_data:read_image
+  #       image/vnd.microsoft.icon: image_data:read_image
+  #       image/webp: image_data:read_image
+  #       image/x-ms-bmp: image_data:read_image
+  #       text/markdown: ignore_data:read_ignore
+  #       text/plain: ignore_data:read_ignore
+  #       text/spec_data: spec_data:read_spec_data
+  #       text/x-python: ignore_data:read_ignore
+  #       text/xml: ignore_data:read_ignore
