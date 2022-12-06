@@ -5,11 +5,11 @@ Simple demo tiled Python client using the http API.
 Maybe, instead of a Python client, I will show some specific URI queries and responses.
 
 * [x] Find all runs in a catalog between these two ISO8601 dates.
+* [x] Find run(s) which match given metadata.
 * [ ] Get overall metadata from given run.
 * [ ] What are the data streams in this run?
 * [ ] What is the metadata for this stream?
 * [ ] Get the data from the data stream named primary (the canonical main data).
-* [ ] Find run(s) which match given metadata.
 * [ ] What about loose matches?  Maybe not now.  Might require some deeper expertise.
 """
 
