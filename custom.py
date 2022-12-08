@@ -8,6 +8,7 @@ from punx.utils import isHdf5FileObject
 from punx.utils import isNeXusFile
 from spec2nexus.spec import is_spec_file_with_header
 import h5py
+import hdf5plugin
 import pathlib
 
 
