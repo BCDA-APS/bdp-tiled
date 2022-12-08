@@ -17,8 +17,8 @@ Produce some specific URI queries and responses.
 
 from tiled.client import from_uri
 from tiled.client.cache import Cache
-import tiled.queries
 from tiled.utils import tree
+import tiled.queries
 
 
 def overview(host="localhost", port=8000):
@@ -30,7 +30,7 @@ def overview(host="localhost", port=8000):
     # tree(client)
 
 
-def main(host="localhost", port=8000):
+def demo2(host="localhost", port=8000):
     client = from_uri(f"http://{host}:{port}", cache=Cache.in_memory(2e9))
     cat = client["20idb_usaxs"]
 
@@ -73,6 +73,21 @@ def main(host="localhost", port=8000):
         ]
     }
 
+
+def main(host="localhost", port=8000):
+    client = from_uri(f"http://{host}:{port}", cache=Cache.in_memory(2e9))
+    cat = client["bdp2022"]
+    # uid = "00714a91-c33e-4e7b-90fd-2e8f385bebc9"
+    # run = cat[uid]
+    run = cat.search(tiled.queries.Key("plan_name") == "take_image")[-1]
+    for k, v in run.primary.data.items():
+        print(f"{k=} {v.shape=}  {v.size=}  {len(v)=}")
+        data = v.read()  # a really big bite for the image data!
+    # /api/v1/array/block
+    # /{catalog}
+    # /{uid}
+    # /{stream}
+    # /data/adsimdet_image?block=0,0,0,0&format=application/octet-stream
 
 if __name__ == "__main__":
     main()

@@ -18,7 +18,7 @@ import requests
 import pyRestTable
 
 
-def tiled_query(server, catalog, api="/api/v1/node/search", suffix="", port=8000):
+def requests_tiled(server, catalog, api="/api/v1/node/search", suffix="", port=8000):
     uri = f"http://{server}:{port}{api}/{catalog}{suffix}"
     r = requests.get(uri)
     # print(f"{r.encoding=}")
@@ -37,14 +37,14 @@ def overview():
     for catalog in "bdp2022 20idb_usaxs".split():
         # how many runs in the catalog?
         # Set limit to 1 because a 0 means ALL the runs.
-        response = tiled_query("terrier", catalog, suffix="?page[limit]=1")
+        response = requests_tiled("terrier", catalog, suffix="?page[limit]=1")
         # print(f"{response['error']=}")
         count = response["meta"]["count"]
         print(f"{catalog=} has {count} runs")
 
         # get the n most recent runs
         num_runs = 20
-        response = tiled_query(
+        response = requests_tiled(
             "terrier",
             catalog,
             suffix=f"?page[offset]={count-num_runs}&page[limit]={num_runs}",
@@ -94,47 +94,95 @@ def table_of_runs(runs):
     return table
 
 
-def main():
-    server = "localhost"
-    catalog = "20idb_usaxs"
-
+def find_runs_by_date(server, catalog, since, until, limit=20):
     # Find all runs in a catalog between these two ISO8601 dates.
-    start_time = "2022-12-01 15:50"
-    end_time = "2022-12-01 16:10"
-    ts_since = datetime.datetime.fromisoformat(start_time).timestamp()
-    ts_until = datetime.datetime.fromisoformat(end_time).timestamp()
+    def to_ts(isodate):
+        return datetime.datetime.fromisoformat(isodate).timestamp()
+
     tz = "US/Central"
     suffix = (
-        "?page[offset]=00&page[limit]=100"
-        f"&filter[time_range][condition][since]={ts_since}"
-        f"&filter[time_range][condition][until]={ts_until}"
+        "?page[offset]=0"
+        f"&page[limit]={limit}"
+        f"&filter[time_range][condition][since]={to_ts(since)}"
+        f"&filter[time_range][condition][until]={to_ts(until)}"
         f"&filter[time_range][condition][timezone]={tz}"
         "&sort=time"
     )
-    r = tiled_query(server, catalog, suffix=suffix)
-    print(f"Runs starting after '{start_time}' and before '{end_time}'")
+    r = requests_tiled(server, catalog, suffix=suffix)
+    print(f"Runs starting after '{since}' and before '{until}'")
     print(table_of_runs(r["data"]))
 
+    return r
+
+
+def find_by_plan_name(server, catalog, plan_name, limit=20):
     # Find run(s) which match given metadata: given plan_name
-    plan_name = "my_fly_plan"
     case_sensitive = False
     suffix = (
         "?page[offset]=0"
-        # f"&filter[fulltext][condition][text]={plan_name}"
-        # f"&filter[fulltext][condition][case_sensitive]={str(case_sensitive).lower()}"
+        f"&page[limit]={limit}"
         "&filter[eq][condition][key]=plan_name"
         f'&filter[eq][condition][value]="{plan_name}"'
         "&sort=time"
     )
-    r = tiled_query(server, catalog, suffix=suffix)
+    r = requests_tiled(server, catalog, suffix=suffix)
     print(f"Runs that match 'plan_name={plan_name}'")
     print(table_of_runs(r["data"]))
 
-    # With latest run:
-    # Get overall metadata from this run.
-    # What are the data streams in this run?
-    # Get the data from the data stream named primary (the canonical main data).
-    # What is the metadata for this stream?
+    return r
+
+
+def get_run_metadata(server, catalog, uid, stream=None):
+    suffix = f"/{uid}"
+    if stream is not None:
+        suffix += f"/{stream}"
+    r = requests_tiled(
+        server, catalog,
+        api="/api/v1/node/metadata",
+        suffix=suffix,
+    )
+    print(r["data"]["attributes"]["metadata"])
+
+    return r["data"]["attributes"]["metadata"]
+
+
+def main():
+    server = "localhost"
+    catalog = "bdp2022"
+
+    r = find_runs_by_date(
+        server, "20idb_usaxs", "2022-11-01 15:50", "2022-12-01 16:10"
+    )
+    r = find_by_plan_name(server, "20idb_usaxs", "tune_a2rp")
+
+    r = find_runs_by_date(
+        server, "bdp2022", "2022-11-01 15:50", "2022-12-01 16:10"
+    )
+    r = find_by_plan_name(server, "bdp2022", "take_image")
+
+    r = get_run_metadata(
+        server, "bdp2022", "00714a91-c33e-4e7b-90fd-2e8f385bebc9",
+    )
+
+    r = get_run_metadata(
+        server, "bdp2022", "00714a91-c33e-4e7b-90fd-2e8f385bebc9", "primary"
+    )
+
+    if False:
+        # Get the data from the data stream named primary (the canonical main data).
+        data_format = "json"
+        uid = "00714a91-c33e-4e7b-90fd-2e8f385bebc9"
+        r = requests_tiled(
+            server, catalog,
+            api="/api/v1/array/full",
+            suffix=(
+                f"/{uid}"
+                f"/{stream_name}"
+                "/data"
+                r"%format=json"
+            )
+        )
+        print(len(r))
 
 
 if __name__ == "__main__":
