@@ -83,11 +83,13 @@ def main(host="localhost", port=8000):
     for k, v in run.primary.data.items():
         print(f"{k=} {v.shape=}  {v.size=}  {len(v)=}")
         data = v.read()  # a really big bite for the image data!
-    # /api/v1/array/block
-    # /{catalog}
-    # /{uid}
-    # /{stream}
-    # /data/adsimdet_image?block=0,0,0,0&format=application/octet-stream
+        # /api/v1/array/block
+        # /{catalog}
+        # /{uid}
+        # /{stream}
+        # /data/adsimdet_image
+        # ?block=0,0,0,0
+        # &format=application/octet-stream
 
 if __name__ == "__main__":
     main()
