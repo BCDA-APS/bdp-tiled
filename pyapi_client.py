@@ -74,22 +74,35 @@ def demo2(host="localhost", port=8000):
     }
 
 
-def main(host="localhost", port=8000):
+def get_run_data(catalog, uid, host="localhost", port=8000):
     client = from_uri(f"http://{host}:{port}", cache=Cache.in_memory(2e9))
-    cat = client["bdp2022"]
+    cat = client[catalog]
     # uid = "00714a91-c33e-4e7b-90fd-2e8f385bebc9"
-    # run = cat[uid]
-    run = cat.search(tiled.queries.Key("plan_name") == "take_image")[-1]
-    for k, v in run.primary.data.items():
-        print(f"{k=} {v.shape=}  {v.size=}  {len(v)=}")
-        data = v.read()  # a really big bite for the image data!
-        # /api/v1/array/block
-        # /{catalog}
-        # /{uid}
-        # /{stream}
-        # /data/adsimdet_image
-        # ?block=0,0,0,0
-        # &format=application/octet-stream
+    run = cat[uid]
+
+    # for k, v in run.primary.data.items():
+    #     print(f"{k=} {v.shape=}  {v.size=}  {len(v)=}")
+    #     data = v.read()  # a really big bite for the image data!
+    #     # /api/v1/array/block
+    #     # /{catalog}
+    #     # /{uid}
+    #     # /{stream}
+    #     # /data/adsimdet_image
+    #     # ?block=0,0,0,0
+    #     # &format=application/octet-stream
+
+    return run
+
+# http://localhost:8000/api/v1/array/block/bdp2022/00714a91-c33e-4e7b-90fd-2e8f385bebc9/primary/data/adsimdet_image?block=0,0,0,0
+
+def main(host="localhost", port=8000):
+    run = get_run_data(
+        "bdp2022", "00714a91-c33e-4e7b-90fd-2e8f385bebc9", host=host, port=port
+    )
+    print(f"{run.metadata=}")
+    print(f"{run.primary.metadata=}")
+    # d = run.primary.data.values()[-1].read()
+    # print(type(d))
 
 if __name__ == "__main__":
     main()

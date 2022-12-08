@@ -146,27 +146,45 @@ def get_run_metadata(server, catalog, uid, stream=None):
     return r["data"]["attributes"]["metadata"]
 
 
+def get_run_data(server, catalog, uid, stream, data_name, data_format="json"):
+    r = requests_tiled(
+        server, catalog,
+        api="/api/v1/array/full",
+        suffix=(
+            f"/{uid}"
+            f"/{stream}"
+            "/data"
+            f"/{data_name}"
+            "?"
+            f"format={data_format}"
+        )
+    )
+    print(type(r))
+
 def main():
     server = "localhost"
     catalog = "bdp2022"
 
-    r = find_runs_by_date(
-        server, "20idb_usaxs", "2022-11-01 15:50", "2022-12-01 16:10"
-    )
-    r = find_by_plan_name(server, "20idb_usaxs", "tune_a2rp")
+    if False:
+        r = find_runs_by_date(
+            server, "20idb_usaxs", "2022-11-01 15:50", "2022-12-01 16:10"
+        )
+        r = find_by_plan_name(server, "20idb_usaxs", "tune_a2rp")
 
-    r = find_runs_by_date(
-        server, "bdp2022", "2022-11-01 15:50", "2022-12-01 16:10"
-    )
-    r = find_by_plan_name(server, "bdp2022", "take_image")
+        r = find_runs_by_date(
+            server, "bdp2022", "2022-11-01 15:50", "2022-12-01 16:10"
+        )
+        r = find_by_plan_name(server, "bdp2022", "take_image")
 
-    r = get_run_metadata(
-        server, "bdp2022", "00714a91-c33e-4e7b-90fd-2e8f385bebc9",
-    )
+        r = get_run_metadata(
+            server, "bdp2022", "00714a91-c33e-4e7b-90fd-2e8f385bebc9",
+        )
 
-    r = get_run_metadata(
-        server, "bdp2022", "00714a91-c33e-4e7b-90fd-2e8f385bebc9", "primary"
-    )
+        r = get_run_metadata(
+            server, "bdp2022", "00714a91-c33e-4e7b-90fd-2e8f385bebc9", "primary"
+        )
+
+    get_run_data(server, "bdp2022", "ae762f9c-4933-4aa4-a720-147f4aaab6fd", "primary", "adpvadet_pva1_execution_time", "json")
 
     if False:
         # Get the data from the data stream named primary (the canonical main data).
