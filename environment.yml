@@ -9,6 +9,8 @@ channels:
 
 dependencies:
   - python >=3.8, <3.11
+  - area-detector-handlers
+  - hdf5plugin
 
   # dependencies not automatically installed by 'pip install tiled' below
   - bson
