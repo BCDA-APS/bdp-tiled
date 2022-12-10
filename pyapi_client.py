@@ -1,5 +1,5 @@
 """
-Demo of a tiled Python client using the tiled Python API.
+Demo of a tiled Python client using the tiled.client Python API.
 
 Use this Python client to genereate requests from the tiled server.
 Then, inspect the server's logs for the specific URIs that were used.
@@ -101,8 +101,11 @@ def main(host="localhost", port=8000):
     )
     print(f"{run.metadata=}")
     print(f"{run.primary.metadata=}")
-    # d = run.primary.data.values()[-1].read()
-    # print(type(d))
+    print(f"{list(run.primary.data.keys())=}")
+    signal_name = "time"  # or adsimdet_image which has shape [1, 1, 1024, 1024]
+    arr = run.primary.data["time"]
+    print(f"{type(arr)=}")
+    print(f"{arr=}")
 
 if __name__ == "__main__":
     main()

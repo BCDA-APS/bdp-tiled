@@ -37,7 +37,7 @@ def overview():
     for catalog in "bdp2022 20idb_usaxs".split():
         # how many runs in the catalog?
         # Set limit to 1 because a 0 means ALL the runs.
-        response = requests_tiled("terrier", catalog, suffix="?page[limit]=1")
+        response = requests_tiled("localhost", catalog, suffix="?page[limit]=1")
         # print(f"{response['error']=}")
         count = response["meta"]["count"]
         print(f"{catalog=} has {count} runs")
@@ -45,7 +45,7 @@ def overview():
         # get the n most recent runs
         num_runs = 20
         response = requests_tiled(
-            "terrier",
+            "localhost",
             catalog,
             suffix=f"?page[offset]={count-num_runs}&page[limit]={num_runs}",
         )
@@ -160,38 +160,48 @@ def get_run_data(server, catalog, uid, stream, data_name, data_format="json"):
         )
     )
     print(type(r))
+    return r
+
 
 def main():
     server = "localhost"
-    catalog = "bdp2022"
 
     if False:
         r = find_runs_by_date(
             server, "20idb_usaxs", "2022-11-01 15:50", "2022-12-01 16:10"
         )
-        r = find_by_plan_name(server, "20idb_usaxs", "tune_a2rp")
-
         r = find_runs_by_date(
             server, "bdp2022", "2022-11-01 15:50", "2022-12-01 16:10"
         )
+
+    if False:
+        r = find_by_plan_name(server, "20idb_usaxs", "tune_a2rp")
         r = find_by_plan_name(server, "bdp2022", "take_image")
 
+    if False:
         r = get_run_metadata(
             server, "bdp2022", "00714a91-c33e-4e7b-90fd-2e8f385bebc9",
         )
-
         r = get_run_metadata(
             server, "bdp2022", "00714a91-c33e-4e7b-90fd-2e8f385bebc9", "primary"
         )
 
-    get_run_data(server, "bdp2022", "ae762f9c-4933-4aa4-a720-147f4aaab6fd", "primary", "adpvadet_pva1_execution_time", "json")
+    if False:
+        arr = get_run_data(
+            server,
+            "bdp2022",
+            "ae762f9c-4933-4aa4-a720-147f4aaab6fd",
+            "primary",
+            "adpvadet_pva1_execution_time", "json"
+        )
 
     if False:
         # Get the data from the data stream named primary (the canonical main data).
         data_format = "json"
         uid = "00714a91-c33e-4e7b-90fd-2e8f385bebc9"
         r = requests_tiled(
-            server, catalog,
+            server, 
+            "bdp2022",
             api="/api/v1/array/full",
             suffix=(
                 f"/{uid}"
