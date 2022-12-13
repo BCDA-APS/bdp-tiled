@@ -96,8 +96,11 @@ def get_run_data(catalog, uid, host="localhost", port=8000):
 # http://localhost:8000/api/v1/array/block/bdp2022/00714a91-c33e-4e7b-90fd-2e8f385bebc9/primary/data/adsimdet_image?block=0,0,0,0
 
 def main(host="localhost", port=8000):
+    # run = get_run_data(
+    #     "bdp2022", "00714a91-c33e-4e7b-90fd-2e8f385bebc9", host=host, port=port
+    # )
     run = get_run_data(
-        "bdp2022", "00714a91-c33e-4e7b-90fd-2e8f385bebc9", host=host, port=port
+        "bdp2022", "43044b6e-f6ba-48cb-a975-90d236dcbaaa", host=host, port=port
     )
     print(f"{run.metadata=}")
     print(f"{run.primary.metadata=}")
@@ -106,6 +109,7 @@ def main(host="localhost", port=8000):
     arr = run.primary.data["time"]
     print(f"{type(arr)=}")
     print(f"{arr=}")
+
 
 if __name__ == "__main__":
     main()
