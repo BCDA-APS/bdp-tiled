@@ -21,6 +21,7 @@ dependencies:
   - h5py
   - hdf5plugin
   - punx
+  - pysumreg
   - spec2nexus
 
   # rely on pip to install tiled and its dependencies
