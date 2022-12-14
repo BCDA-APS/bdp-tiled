@@ -74,11 +74,13 @@ def demo2(host="localhost", port=8000):
     }
 
 
-def get_run_data(catalog, uid, host="localhost", port=8000):
+def get_run(catalog, uid, host="localhost", port=8000):
     client = from_uri(f"http://{host}:{port}", cache=Cache.in_memory(2e9))
-    cat = client[catalog]
-    # uid = "00714a91-c33e-4e7b-90fd-2e8f385bebc9"
-    run = cat[uid]
+    return client[catalog][uid]
+
+
+def get_run_data(catalog, uid, host="localhost", port=8000):
+    run = get_run(catalog, uid, host=host, port=port)
 
     # for k, v in run.primary.data.items():
     #     print(f"{k=} {v.shape=}  {v.size=}  {len(v)=}")
@@ -91,11 +93,12 @@ def get_run_data(catalog, uid, host="localhost", port=8000):
     #     # ?block=0,0,0,0
     #     # &format=application/octet-stream
 
+    # http://localhost:8000/api/v1/array/block/bdp2022/00714a91-c33e-4e7b-90fd-2e8f385bebc9/primary/data/adsimdet_image?block=0,0,0,0
+
     return run
 
-# http://localhost:8000/api/v1/array/block/bdp2022/00714a91-c33e-4e7b-90fd-2e8f385bebc9/primary/data/adsimdet_image?block=0,0,0,0
 
-def main(host="localhost", port=8000):
+def some_run_data(host="localhost", port=8000):
     # run = get_run_data(
     #     "bdp2022", "00714a91-c33e-4e7b-90fd-2e8f385bebc9", host=host, port=port
     # )
@@ -109,6 +112,17 @@ def main(host="localhost", port=8000):
     arr = run.primary.data["time"]
     print(f"{type(arr)=}")
     print(f"{arr=}")
+
+
+def external_files(catalog, uid, host="localhost", port=8000):
+    run = get_run(catalog, uid, host=host, port=port)
+    docs = [doc for name, doc in run.documents() if name in ('resource', 'datum_page')]
+    print(f"{len(docs)=}")
+
+
+def main():
+    r = external_files("bdp2022", "43044b6e-f6ba-48cb-a975-90d236dcbaaa")
+    print(f"{r=}")
 
 
 if __name__ == "__main__":
