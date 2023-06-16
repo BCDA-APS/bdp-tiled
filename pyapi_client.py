@@ -1,7 +1,7 @@
 """
 Demo of a tiled Python client using the tiled.client Python API.
 
-Use this Python client to genereate requests from the tiled server.
+Use this Python client to generate requests from the tiled server.
 Then, inspect the server's logs for the specific URIs that were used.
 
 Produce some specific URI queries and responses.
@@ -15,6 +15,7 @@ Produce some specific URI queries and responses.
 * [ ] What about loose matches?  Maybe not now.  Might require some deeper expertise.
 """
 
+import datetime
 from tiled.client import from_uri
 from tiled.client.cache import Cache
 from tiled.utils import tree
@@ -26,30 +27,53 @@ def overview(host="localhost", port=8000):
     print(f"{client=}")
     for catalog in client:
         print(f"{catalog=}  {client[catalog]=}")
-        print(f"{client.search(FullText('bdp'))}")
+        print(f"{client.search(tiled.queries.FullText('bdp'))}")
     # tree(client)
 
 
 def demo2(host="localhost", port=8000):
     client = from_uri(f"http://{host}:{port}", cache=Cache.in_memory(2e9))
-    cat = client["20idb_usaxs"]
+    # cat = client["20idb_usaxs"]
+    cat = client["class_2021_03"]
+    print(f"{cat=}")
 
-    # Find all runs in a catalog between these two ISO8601 dates.
-    start_time = "2022-12-01 15:01"
-    end_time = "2022-12-01 16:45"
+    def iso2time(isotime):
+        return datetime.datetime.timestamp(datetime.datetime.fromisoformat(isotime))
+    def QueryTimeFrom(isotime):
+        return tiled.queries.Key("time") >= iso2time(isotime)
+    def QueryTimeUntil(isotime):
+        return tiled.queries.Key("time") < iso2time(isotime)
+
+    # Find all runs in the catalog between these two ISO8601 dates.
+    start_time = "2021-03-17 00:30"
+    end_time = "2021-05-19 15:15"
+    cat = cat.search(QueryTimeFrom(start_time)).search(QueryTimeUntil(end_time))
+    print(f"{cat=}")
 
     # Find run(s) which match given metadata: given plan_name
-    plan_name = "my_fly_plan"
-    case_sensitive = False
+    plan_name = "rel_scan"
+    # case_sensitive = False
     # runs = cat.search(tiled.queries.FullText(plan_name), case_sensitive=case_sensitive)
-    runs = cat.search(tiled.queries.Key("plan_name") == plan_name)
-    print(f"{runs=}")
+    cat = cat.search(tiled.queries.Key("plan_name") == plan_name)
+    print(f"{cat=}")
 
     # With latest run:
+    run = cat.values()[-1]
+    print(f"last run: {run=}")
+
     # Get overall metadata from this run.
+    print(f"Run metadata: {run.metadata=}")
+
     # What are the data streams in this run?
+    stream_names = run.metadata["summary"]["stream_names"]
+    print(f"streams: {stream_names=}")
+
     # Get the data from the data stream named primary (the canonical main data).
-    # What is the metadata for this stream?
+    if "primary" in stream_names:
+        stream_data = run["primary"]
+        print(f"{stream_data['data']=}")
+        # What is the metadata for this stream?
+        print(f"{stream_data.metadata=}")
 
     ideas_from_json_api = {
         "queries": [
@@ -126,4 +150,5 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    # main()
+    demo2()
