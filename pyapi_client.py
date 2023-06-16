@@ -39,7 +39,7 @@ def demo2(host="localhost", port=8000):
 
     def iso2time(isotime):
         return datetime.datetime.timestamp(datetime.datetime.fromisoformat(isotime))
-    def QueryTimeFrom(isotime):
+    def QueryTimeSince(isotime):
         return tiled.queries.Key("time") >= iso2time(isotime)
     def QueryTimeUntil(isotime):
         return tiled.queries.Key("time") < iso2time(isotime)
@@ -47,13 +47,13 @@ def demo2(host="localhost", port=8000):
     # Find all runs in the catalog between these two ISO8601 dates.
     start_time = "2021-03-17 00:30"
     end_time = "2021-05-19 15:15"
-    cat = cat.search(QueryTimeFrom(start_time)).search(QueryTimeUntil(end_time))
+    cat = cat.search(QueryTimeSince(start_time)).search(QueryTimeUntil(end_time))
     print(f"{cat=}")
 
     # Find run(s) which match given metadata: given plan_name
     plan_name = "rel_scan"
     # case_sensitive = False
-    # runs = cat.search(tiled.queries.FullText(plan_name), case_sensitive=case_sensitive)
+    # cat = cat.search(tiled.queries.FullText(plan_name), case_sensitive=case_sensitive)
     cat = cat.search(tiled.queries.Key("plan_name") == plan_name)
     print(f"{cat=}")
 
