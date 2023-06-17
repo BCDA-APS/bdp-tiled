@@ -19,7 +19,7 @@ def QueryTimeUntil(isotime):
     return tiled.queries.Key("time") < iso2time(isotime)
 
 
-def get_tiled_runs(cat, since=None, until=None, **keys):
+def get_tiled_runs(cat, since=None, until=None, full_text={}, **keys):
     """
     Return a new catalog, filtered by search terms.
 
@@ -36,6 +36,10 @@ def get_tiled_runs(cat, since=None, until=None, **keys):
         Earliest start date (& time), in ISO8601 format.
     `until` str :
         Latest start date (& time), in ISO8601 format.
+    `full_text` dict :
+        Dictionary ({str: bool}) of full text searches.  The dictionary keys are
+        the text strings to be searched and the values are boolean where
+        `True=case_sensitive`.
     `keys` dict :
         Dictionary of metadata keys and values to be matched.
     """
@@ -46,6 +50,9 @@ def get_tiled_runs(cat, since=None, until=None, **keys):
 
     for k, v in keys.items():
         cat = cat.search(tiled.queries.Key(k) == v)
+
+    for k, v in full_text.items():
+        cat = cat.search(tiled.queries.FullText(k, case_sensitive=v))
     return cat
 
 
@@ -96,6 +103,14 @@ def main():
 
     cat = get_tiled_runs(cat, since=start_time, until=end_time, plan_name="rel_scan")
     print(f"filtered: {cat=}")
+    print(run_summary_table(cat))
+
+    cat = get_tiled_runs(cat, full_text={"noisy": True})
+    print(f"filtered runs with 'noisy' as text: {cat=}")
+    print(run_summary_table(cat))
+
+    cat = get_tiled_runs(client[catalog], full_text={"noisy": True})
+    print(f"all runs with 'noisy' as text: {cat=}")
     print(run_summary_table(cat))
 
 
