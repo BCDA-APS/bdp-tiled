@@ -19,7 +19,7 @@ def QueryTimeUntil(isotime):
     return tiled.queries.Key("time") < iso2time(isotime)
 
 
-def get_tiled_runs(cat, since=None, until=None, full_text={}, **keys):
+def get_tiled_runs(cat, since=None, until=None, text=[], text_case=[], **keys):
     """
     Return a new catalog, filtered by search terms.
 
@@ -36,10 +36,10 @@ def get_tiled_runs(cat, since=None, until=None, full_text={}, **keys):
         Earliest start date (& time), in ISO8601 format.
     `until` str :
         Latest start date (& time), in ISO8601 format.
-    `full_text` dict :
-        Dictionary ({str: bool}) of full text searches.  The dictionary keys are
-        the text strings to be searched and the values are boolean where
-        `True=case_sensitive`.
+    `text` [str] :
+        List of full text searches.  Not sensitive to case.
+    `text_case` [str] :
+        List of full text searches.  Case sensitive.
     `keys` dict :
         Dictionary of metadata keys and values to be matched.
     """
@@ -51,8 +51,10 @@ def get_tiled_runs(cat, since=None, until=None, full_text={}, **keys):
     for k, v in keys.items():
         cat = cat.search(tiled.queries.Key(k) == v)
 
-    for k, v in full_text.items():
-        cat = cat.search(tiled.queries.FullText(k, case_sensitive=v))
+    for v in text:
+        cat = cat.search(tiled.queries.FullText(v, case_sensitive=False))
+    for v in text_case:
+        cat = cat.search(tiled.queries.FullText(v, case_sensitive=True))
     return cat
 
 
@@ -105,12 +107,22 @@ def main():
     print(f"filtered: {cat=}")
     print(run_summary_table(cat))
 
-    cat = get_tiled_runs(cat, full_text={"noisy": True})
-    print(f"filtered runs with 'noisy' as text: {cat=}")
+    text = "noisy"
+    cat = get_tiled_runs(cat, text=[text])
+    print(f"filtered runs with {text!r} as text: {cat=}")
     print(run_summary_table(cat))
 
-    cat = get_tiled_runs(client[catalog], full_text={"noisy": True})
-    print(f"all runs with 'noisy' as text: {cat=}")
+    text = "save & restore"
+    # text = "locate_image_peak"
+    # text = "tscan"
+    # text = "gp:scaler1"
+    # text = "zaxis"
+    cat = get_tiled_runs(
+        client[catalog],
+        text=[text],
+        # pid=154446
+    )
+    print(f"all runs with {text!r} as text: {cat=}")
     print(run_summary_table(cat))
 
 
